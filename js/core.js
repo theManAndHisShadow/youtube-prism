@@ -43,10 +43,7 @@ function asyncQuerySelector(selector) {
 preventMainPageLoading();
 
 document.addEventListener("DOMContentLoaded", function(){
-    asyncQuerySelector('#start a#logo').then(logoLink => {
-        logoLink.href = newHomeLink;
-    });
-
+    // Removing first three elements from full size left menu
     asyncQuerySelector('#sections ytd-guide-entry-renderer').then(element => {
         let leftMenu = element.parentNode;
 
@@ -58,5 +55,10 @@ document.addEventListener("DOMContentLoaded", function(){
 
         // remove subs page button from menu
         leftMenu.children[0].remove();
+    });
+
+    // Removing mini menu
+    asyncQuerySelector('ytd-mini-guide-renderer[role="navigation"] #items').then(miniMenu => {
+        miniMenu.parentNode.remove();
     });
 });
