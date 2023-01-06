@@ -43,6 +43,31 @@ function asyncQuerySelector(selector) {
 preventMainPageLoading();
 
 document.addEventListener("DOMContentLoaded", function(){
+    // TODO: Refactor this code block
+    // This solution is very unoptimal, cause make node.. 
+    // ..clone operations and force page to reload
+    asyncQuerySelector('#start a#logo').then(logoLink => {
+        // YouTube logo button
+        let logoButton = logoLink.parentNode;
+        let clonedLogoButton = logoButton.cloneNode(true);
+
+        // Replacing to remove main page redirect on click
+        // IDK how to prevent main page redirect...
+        logoButton.parentNode.replaceChild(clonedLogoButton, logoButton);
+
+        let cloned_logoLink = clonedLogoButton.children[0];
+        let cloned_logoText = clonedLogoButton.children[0].children[0];
+        let cloned_logoCountryMark = clonedLogoButton.children[1];
+
+        cloned_logoLink.href = newHomeLink;
+        cloned_logoText.removeAttribute('hidden');
+        cloned_logoCountryMark.removeAttribute('hidden');
+
+        // show extension mark :)
+        cloned_logoCountryMark.innerText = 'zen';
+    });
+
+
     // Removing first three elements from full size left menu
     asyncQuerySelector('#sections ytd-guide-entry-renderer').then(element => {
         let leftMenu = element.parentNode;
@@ -57,6 +82,7 @@ document.addEventListener("DOMContentLoaded", function(){
         leftMenu.children[0].remove();
     });
 
+    
     // Removing mini menu
     asyncQuerySelector('ytd-mini-guide-renderer[role="navigation"] #items').then(miniMenu => {
         miniMenu.parentNode.remove();
