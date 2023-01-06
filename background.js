@@ -1,0 +1,3 @@
+const EXTENSION_SETTINGS = {
+    
+}
