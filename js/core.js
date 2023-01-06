@@ -1,5 +1,6 @@
 const newHomeLink = "https://www.youtube.com/feed/subscriptions";
 
+
 function preventMainPageLoading(){
     let path = document.location.pathname;
 
@@ -12,6 +13,11 @@ function preventMainPageLoading(){
 }
 
 
+/**
+ * Solution from https://stackoverflow.com/questions/5525071/how-to-wait-until-an-element-exists
+ * @param {String} selector CSS Selector
+ * @returns 
+ */
 function asyncQuerySelector(selector) {
     return new Promise(resolve => {
         if (document.querySelector(selector)) {
@@ -31,6 +37,8 @@ function asyncQuerySelector(selector) {
         });
     });
 }
+
+
 
 preventMainPageLoading();
 
