@@ -12,6 +12,40 @@ function preventMainPageLoading(){
     }
 }
 
+/**
+ * Remaking YT logo button behavior: from redirecting to main page to redirecting to subs page
+ * @param {Object} logoButton HTMLElement object reference
+ */
+function remakeLogoButton(logoButton){
+    let clonedLogoButton = logoButton.cloneNode(true);
+
+    // Replacing to remove main page redirect on click
+    // IDK how to prevent main page redirect...
+    logoButton.parentNode.replaceChild(clonedLogoButton, logoButton);
+
+    let cloned_logoLink = clonedLogoButton.children[0];
+    let cloned_logoText = clonedLogoButton.children[0].children[0];
+    let cloned_logoCountryMark = clonedLogoButton.children[1];
+
+    cloned_logoLink.href = newHomeLink;
+    cloned_logoText.removeAttribute('hidden');
+    cloned_logoCountryMark.removeAttribute('hidden');
+
+    // changing logo button functional
+    clonedLogoButton.addEventListener("click", function(event){
+        // prevent full page refresh
+        event.preventDefault();
+
+        // query subs page button
+        asyncQuerySelector('#sections #items ytd-guide-entry-renderer').then(element => {
+            element.click(); // emuating subs page nutton clicking
+        });
+    });
+
+    // show extension mark :)
+    cloned_logoCountryMark.innerText = 'prism';
+}
+
 
 /**
  * Solution from https://stackoverflow.com/questions/5525071/how-to-wait-until-an-element-exists
@@ -46,37 +80,16 @@ preventMainPageLoading();
 document.addEventListener("DOMContentLoaded", function(){
     // TODO: Refactor this code block
     // This solution is very unoptimal, cause make node.. 
-    // ..clone operations and force page to reload
+    // ..clone operations
     asyncQuerySelector('#start a#logo').then(logoLink => {
-        // YouTube logo button
-        let logoButton = logoLink.parentNode;
-        let clonedLogoButton = logoButton.cloneNode(true);
+        // YouTube logo button 
+        remakeLogoButton(logoLink.parentNode);
+    });
 
-        // Replacing to remove main page redirect on click
-        // IDK how to prevent main page redirect...
-        logoButton.parentNode.replaceChild(clonedLogoButton, logoButton);
-
-        let cloned_logoLink = clonedLogoButton.children[0];
-        let cloned_logoText = clonedLogoButton.children[0].children[0];
-        let cloned_logoCountryMark = clonedLogoButton.children[1];
-
-        cloned_logoLink.href = newHomeLink;
-        cloned_logoText.removeAttribute('hidden');
-        cloned_logoCountryMark.removeAttribute('hidden');
-
-        // changing logo button functional
-        clonedLogoButton.addEventListener("click", function(event){
-            // prevent full page refresh
-            event.preventDefault();
-
-            // query subs page button
-            asyncQuerySelector('#sections #items ytd-guide-entry-renderer').then(element => {
-                element.click(); // emuating subs page nutton clicking
-            });
-        });
-
-        // show extension mark :)
-        cloned_logoCountryMark.innerText = 'prism';
+    // For cases, where YT logo button also placed in collapsed left menu. F
+    // or example, on watch page
+    asyncQuerySelector('#contentContainer a#logo').then(logoLink => {
+        remakeLogoButton(logoLink.parentNode);
     });
 
     // Removing first three elements from full size left menu
@@ -99,5 +112,10 @@ document.addEventListener("DOMContentLoaded", function(){
     // Removing mini menu
     asyncQuerySelector('ytd-mini-guide-renderer[role="navigation"] #items').then(miniMenu => {
         miniMenu.parentNode.remove();
+    });
+
+    // Removing the most distractive feature - realted videos >:}
+    asyncQuerySelector('#secondary #related').then(related => {
+        related.remove();
     });
 });
