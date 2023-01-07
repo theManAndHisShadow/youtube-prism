@@ -42,6 +42,7 @@ function asyncQuerySelector(selector) {
 
 preventMainPageLoading();
 
+
 document.addEventListener("DOMContentLoaded", function(){
     // TODO: Refactor this code block
     // This solution is very unoptimal, cause make node.. 
@@ -67,19 +68,25 @@ document.addEventListener("DOMContentLoaded", function(){
         cloned_logoCountryMark.innerText = 'zen';
     });
 
-
     // Removing first three elements from full size left menu
-    asyncQuerySelector('#sections #items').then(leftMenu => {
+    asyncQuerySelector('#sections #items').then(leftMenuBlock => {
         // remove main page button from menu
-        leftMenu.children[0].remove();
+        leftMenuBlock.children[0].remove();
 
         // remove shorts page button from menu
-        leftMenu.children[0].remove();
+        leftMenuBlock.children[0].remove();
 
         // remove subs page button from menu
-        leftMenu.children[0].remove();
+        leftMenuBlock.children[0].remove();
     });
 
+    asyncQuerySelector('#sections ytd-guide-section-renderer:nth-child(3)').then(navigatorBlock => {
+        navigatorBlock.remove();
+    });
+
+    asyncQuerySelector('#sections ytd-guide-section-renderer:nth-child(4)').then(otherFeaturesBlock => {
+        otherFeaturesBlock.remove();
+    });
     
     // Removing mini menu
     asyncQuerySelector('ytd-mini-guide-renderer[role="navigation"] #items').then(miniMenu => {
