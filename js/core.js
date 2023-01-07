@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function(){
         cloned_logoCountryMark.removeAttribute('hidden');
 
         // show extension mark :)
-        cloned_logoCountryMark.innerText = 'zen';
+        cloned_logoCountryMark.innerText = 'prism';
     });
 
     // Removing first three elements from full size left menu
