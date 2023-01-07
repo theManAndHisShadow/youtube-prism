@@ -64,6 +64,17 @@ document.addEventListener("DOMContentLoaded", function(){
         cloned_logoText.removeAttribute('hidden');
         cloned_logoCountryMark.removeAttribute('hidden');
 
+        // changing logo button functional
+        clonedLogoButton.addEventListener("click", function(event){
+            // prevent full page refresh
+            event.preventDefault();
+
+            // query subs page button
+            asyncQuerySelector('#sections #items ytd-guide-entry-renderer').then(element => {
+                element.click(); // emuating subs page nutton clicking
+            });
+        });
+
         // show extension mark :)
         cloned_logoCountryMark.innerText = 'prism';
     });
@@ -74,9 +85,6 @@ document.addEventListener("DOMContentLoaded", function(){
         leftMenuBlock.children[0].remove();
 
         // remove shorts page button from menu
-        leftMenuBlock.children[0].remove();
-
-        // remove subs page button from menu
         leftMenuBlock.children[0].remove();
     });
 
