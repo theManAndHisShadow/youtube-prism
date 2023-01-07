@@ -69,9 +69,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
     // Removing first three elements from full size left menu
-    asyncQuerySelector('#sections ytd-guide-entry-renderer').then(element => {
-        let leftMenu = element.parentNode;
-
+    asyncQuerySelector('#sections #items').then(leftMenu => {
         // remove main page button from menu
         leftMenu.children[0].remove();
 
