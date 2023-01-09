@@ -1,5 +1,5 @@
 # Prism for YouTube 
-Prism is a small YouTube browser extension that keeps you focused. No more distracion.
+Prism is a small YouTube browser extension that keeps you focused. No more distraction.
 
 # Features
 * Replacing the main page with a page with subscriptions. 
