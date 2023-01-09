@@ -14,6 +14,7 @@ function preventMainPageLoading(){
     }
 }
 
+
 /**
  * Remaking YT logo button behavior: from redirecting to main page to redirecting to subs page
  * @param {Object} logoButton HTMLElement object reference
@@ -71,5 +72,32 @@ function asyncQuerySelector(selector) {
             childList: true,
             subtree: true
         });
+    });
+}
+
+
+/**
+ * Checks if playlist length and show or hide unnecessary button
+ */
+function showOrHideNextVideoButton(){
+    // If user don`t create a playlist - hide next video button
+    // cause by default next video button plays next related video
+    asyncQuerySelector('.ytp-left-controls a.ytp-next-button.ytp-button').then(nextButton => {
+        nextButton.setAttribute("hidden", "");
+    });
+
+
+    // but if user playlist is exist
+    asyncQuerySelector('ytd-playlist-panel-video-renderer').then(playlistVideo => {
+        let playlist = playlistVideo.parentNode.children;
+
+        // ...and playlist length greaater than zero
+        if(playlist.length > 0) {
+            asyncQuerySelector('.ytp-left-controls a.ytp-next-button.ytp-button').then(nextButton => {
+                nextButton.removeAttribute("hidden"); // unhide next video button
+            })
+        }
+
+        // TODO: when playlist ends, next video button DO NOT play nextn random related video
     });
 }

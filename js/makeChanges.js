@@ -43,4 +43,6 @@ document.addEventListener("DOMContentLoaded", function(){
     asyncQuerySelector('#secondary #related').then(related => {
         related.remove();
     });
+
+    showOrHideNextVideoButton();
 });
