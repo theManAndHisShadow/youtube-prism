@@ -1,4 +1,4 @@
-// All functions deines here 
+// All functions defines here 
 
 const newHomeLink = "https://www.youtube.com/feed/subscriptions";
 
