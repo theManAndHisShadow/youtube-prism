@@ -92,6 +92,8 @@ function asyncQuerySelector(selectors) {
                 // when local promise finally waited element - push it to array
                 targets.push(resultOfAsyncQuery);
 
+                console.log(targets);
+
                 // if all selectors finded - return using global promise resolve
                 if(targets.length === selectors.length) {
                     // if target length is equals 1, 
@@ -119,7 +121,7 @@ function asyncQuerySelector(selectors) {
 function parseURL(url){
     let object = {};
     let splitedURL = url.split("//")[1].split("/")[1];
-    let cleaned = splitedURL.split("?")[1].split("&");
+    let cleaned = splitedURL.match(/(\?|\&)/gm) ? splitedURL.split("?")[1].split("&") : splitedURL;
 
     cleaned.forEach(key => {
         key = key.split("=");
@@ -141,6 +143,8 @@ function showOrHideNextVideoButton(){
         let currentVideoID = parseURL(currentVideoURL).v;
         let lastVideo = playlist[playlist.length - 1];
         let lastVideoID = parseURL(lastVideo.children[0].href).v;
+
+        console.log(currentVideoID, lastVideoID);
 
         // ...and playlist length greaater than zero and it is not last video* on playlist
         // *cause i this case play next vide button plays next RELATED video
@@ -171,6 +175,8 @@ function showOrHideNextVideoButton(){
 
         // if user clicked next video button, check is next last video
         asyncQuerySelector('.ytp-left-controls a.ytp-next-button.ytp-button').then(nextButton => {
+            console.log(nextButton);
+
             nextButton.addEventListener("click", () => {
                 _showOrHide(playlist, nextButton.href);
             });
@@ -194,12 +200,5 @@ function showOrHideNextVideoButton(){
                 _showOrHide(playlist, listItem.children[0].href);
             });
         })
-    });
-
-    asyncQuerySelector([
-        '.ytp-miniplayer-controls a.ytp-next-button.ytp-button',
-        '.ytp-left-controls a.ytp-next-button.ytp-button',
-    ]).then(nextButton => {
-        console.log('results', nextButton);
     });
 }
