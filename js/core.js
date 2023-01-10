@@ -75,11 +75,50 @@ function asyncQuerySelector(selector) {
     });
 }
 
+/**
+ * Get url and returns object with splited search keys
+ * @param {String} url url from browser url bar or url from anchor href
+ * @returns Object of result with params like v = video, list = video playlist, 
+ * index = video index in playlist and etc.
+ */
+function parseURL(url){
+    let object = {};
+    let splitedURL = url.split("//")[1].split("/")[1];
+    let cleaned = splitedURL.split("?")[1].split("&");
+
+    cleaned.forEach(key => {
+        key = key.split("=");
+
+        object[key[0]] = key[1];
+    });
+
+    return object;
+}
+
 
 /**
- * Checks if playlist length and show or hide unnecessary button
+ * Checks if playlist length, current video ID 
+ * and playlist videos IDs and show or hide unnecessary 'play next video' button
  */
 function showOrHideNextVideoButton(){
+    function _showOrHide(playlist, currentVideoURL){
+        let currentVideoID = parseURL(currentVideoURL).v;
+        let lastVideo = playlist[playlist.length - 1];
+        let lastVideoID = parseURL(lastVideo.children[0].href).v;
+
+        // ...and playlist length greaater than zero and it is not last video* on playlist
+        // *cause i this case play next vide button plays next RELATED video
+        if(playlist.length > 0 && lastVideoID !== currentVideoID) {
+            asyncQuerySelector('.ytp-left-controls a.ytp-next-button.ytp-button').then(nextButton => {
+                nextButton.removeAttribute("hidden"); // unhide next video button
+            });
+        } else {
+            asyncQuerySelector('.ytp-left-controls a.ytp-next-button.ytp-button').then(nextButton => {
+                nextButton.setAttribute("hidden", "");
+            });
+        }
+    }
+
     // If user don`t create a playlist - hide next video button
     // cause by default next video button plays next related video
     asyncQuerySelector('.ytp-left-controls a.ytp-next-button.ytp-button').then(nextButton => {
@@ -91,13 +130,33 @@ function showOrHideNextVideoButton(){
     asyncQuerySelector('ytd-playlist-panel-video-renderer').then(playlistVideo => {
         let playlist = playlistVideo.parentNode.children;
 
-        // ...and playlist length greaater than zero
-        if(playlist.length > 0) {
-            asyncQuerySelector('.ytp-left-controls a.ytp-next-button.ytp-button').then(nextButton => {
-                nextButton.removeAttribute("hidden"); // unhide next video button
-            })
-        }
+        // if page full reloaded
+        _showOrHide(playlist, window.location.href);
 
-        // TODO: when playlist ends, next video button DO NOT play nextn random related video
+        // if user clicked next video button, check is next last video
+        asyncQuerySelector('.ytp-left-controls a.ytp-next-button.ytp-button').then(nextButton => {
+            nextButton.addEventListener("click", () => {
+                _showOrHide(playlist, nextButton.href);
+            });
+        });
+
+
+        // if user clicked prev video
+        asyncQuerySelector('.ytp-left-controls a.ytp-prev-button.ytp-button').then(prevButton => {
+            prevButton.addEventListener("click", () => {
+                // check is not replay mode (prev button href must be not empty)
+                // and if is TRULY not replay mode - unhide next video button*
+                // *because all prev links not linked with related video...
+                // ...we can unhide next video button
+                if(prevButton.href.length > 0) _showOrHide(playlist, prevButton.href);
+            });
+        });
+
+        // if user just play other video, get current video url from playlist
+        Array.from(playlist).forEach(listItem => {
+            listItem.addEventListener("click", () => {
+                _showOrHide(playlist, listItem.children[0].href);
+            });
+        })
     });
 }
