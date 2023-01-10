@@ -123,11 +123,16 @@ function parseURL(url){
     let splitedURL = url.split("//")[1].split("/")[1];
     let cleaned = splitedURL.match(/(\?|\&)/gm) ? splitedURL.split("?")[1].split("&") : splitedURL;
 
-    cleaned.forEach(key => {
-        key = key.split("=");
-
-        object[key[0]] = key[1];
-    });
+    if(Array.isArray(cleaned)){
+        cleaned.forEach(key => {
+            key = key.split("=");
+    
+            object[key[0]] = key[1];
+        });
+    } else {
+        // just mockup
+        object.v = null;
+    }
 
     return object;
 }
