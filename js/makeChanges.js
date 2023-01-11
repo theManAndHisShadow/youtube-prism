@@ -1,8 +1,14 @@
 // Doing some changes here
 
-preventMainPageLoading();
+Prism.atPage('main').redirectTo('subscriptions');
 
 document.addEventListener("DOMContentLoaded", function(){
+    Prism.atPage('any').execute(() => {});
+    
+    Prism.atPage('subscriptions').execute(() => {});
+    
+    Prism.atPage('watch').execute(() => {});
+    
     // TODO: Refactor this code block
     // This solution is very unoptimal, cause make node.. 
     // ..clone operations

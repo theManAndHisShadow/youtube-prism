@@ -1,21 +1,86 @@
 // All functions defines here 
+
+// temp const
 const newHomeLink = "https://www.youtube.com/feed/subscriptions";
 
+
+
+
+/**
+ * Main extension object
+ */
 const Prism = {
+    // target page URLs
+    pages: {
+        watch: 'https://www.youtube.com/watch',
+        subscriptions:  'https://www.youtube.com/feed/subscriptions',
+        main:  'https://www.youtube.com/',
+        any:   'any',
+    },
     
+    actions: {
+        // state marker that current page targeted by atPage
+        isNecessaryPage: false,
+
+
+
+        /**
+         * Execute some code on targeted page. Depends on isNecessaryPage prop
+         * @param {Function} callback 
+         */
+        execute: function(callback){
+            if(this.isNecessaryPage === true) callback();
+
+            this.isNecessaryPage = false;
+        },
+
+
+
+        /**
+         * Redirect to Youtube target page by page name (look Prism.pages)
+         * @param {string} pageName target page name
+         */
+        redirectTo: function(pageName){
+            if(this.isNecessaryPage === true) {
+                let url_redirect = document.createElement("a");
+                url_redirect.href = Prism.pages[pageName];
+        
+                url_redirect.click();
+            }
+
+            this.isNecessaryPage = false;
+        }
+    },
+
+
+    /**
+     * Controls that current page is targeted. Impacts to isNecessaryPage prop
+     * @param {string} pageName 
+     * @returns 
+     */
+    atPage: function (pageName){
+        let url = window.location.href;
+        let isAnyPage = pageName === "any";
+        let isMainPage = pageName === 'main' && url === Prism.pages[pageName];
+
+        if(Prism.pages[pageName]){
+            if(
+                   isAnyPage 
+                || isMainPage 
+                || parseURL(url).pageName === parseURL(Prism.pages[pageName]).pageName
+            ) {
+                this.actions.isNecessaryPage = true;  
+            } else {
+                this.actions.isNecessaryPage = false;
+            }
+        } else {
+            throw new Error(pageName + " page does not exist!");
+        }
+
+        return this.actions;
+    },
 };
 
-
-function preventMainPageLoading(){
-    let path = document.location.pathname;
-
-    if(path === "/") {
-        let url_redirect = document.createElement("a");
-        url_redirect.href = newHomeLink;
-
-        url_redirect.click();
-    }
-}
 
 
 

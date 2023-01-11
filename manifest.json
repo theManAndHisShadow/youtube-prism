@@ -20,7 +20,7 @@
         "matches": ["https://*.youtube.com/*"],
         "run_at": "document_start",
         "js": [
-          "js/utils.js", 
+          "./js/utils.js", 
           "./js/core.js", 
           "./js/makeChanges.js"
         ]
