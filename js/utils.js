@@ -1,28 +1,41 @@
 // All helper functions defined here
 
+
+
 /**
  * Get url and returns object with splited search keys
  * @param {String} url url from browser url bar or url from anchor href
- * @returns Object of result with params like v = video, list = video playlist, 
+ * @returns Object of result with params like pageName, v = video, list = video playlist, 
  * index = video index in playlist and etc.
  */
 function parseURL(url){
-    let object = {};
-    let splitedURL = url.split("//")[1].split("/")[1];
-    let cleaned = splitedURL.match(/(\?|\&)/gm) ? splitedURL.split("?")[1].split("&") : splitedURL;
+    let resultObject = {};
+    let pageAndArgs = getlastItem(url.split("//")[1].split("/"));
+    let pageName = pageAndArgs.match(/(\?|\&)/gm) ? pageAndArgs.split("?")[0] : pageAndArgs;
+    let args = pageAndArgs.match(/(\?|\&)/gm) ? pageAndArgs.split("?")[1].split("&") : null;
 
-    if(Array.isArray(cleaned)){
-        cleaned.forEach(key => {
+    resultObject.pageName = pageName;
+
+    if(Array.isArray(args)){
+        args.forEach(key => {
             key = key.split("=");
     
-            object[key[0]] = key[1];
+            resultObject[key[0]] = key[1];
         });
-    } else {
-        // just mockup
-        object.v = null;
     }
 
-    return object;
+    return resultObject;
+}
+
+
+
+/**
+ * Returns last item of array
+ * @param {Array} array 
+ * @returns
+ */
+function getlastItem(array){
+    return array[array.length - 1];
 }
 
 
