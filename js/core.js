@@ -1,6 +1,10 @@
 // All functions defines here 
 const newHomeLink = "https://www.youtube.com/feed/subscriptions";
 
+const Prism = {
+    
+};
+
 
 function preventMainPageLoading(){
     let path = document.location.pathname;
