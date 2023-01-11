@@ -19,7 +19,11 @@
       {
         "matches": ["https://*.youtube.com/*"],
         "run_at": "document_start",
-        "js": ["./js/core.js", "./js/makeChanges.js"]
+        "js": [
+          "js/utils.js", 
+          "./js/core.js", 
+          "./js/makeChanges.js"
+        ]
       }
     ],
 
