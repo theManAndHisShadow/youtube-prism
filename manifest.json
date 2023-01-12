@@ -1,12 +1,13 @@
 {
     "name": "youtube-prism",
-    "version": "0.2",
+    "version": "0.3",
     "manifest_version": 3,
 
     "permissions": [
       "activeTab",
       "scripting",
-      "nativeMessaging"
+      "nativeMessaging",
+      "webNavigation"
     ],
 
     "host_permissions": ["<all_urls>"],
