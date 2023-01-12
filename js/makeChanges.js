@@ -1,6 +1,11 @@
 // Doing some changes here
 
+// If user change page, we can reuse some parts of code below at this script
+// Cause  Prism.atPage('any').execute() save .execute() inner function to page name prop...
+/// ...at executionList
 Prism.detectURLModify();
+
+// Preventing default YouTube main page loading
 Prism.atPage('main').redirectTo('subscriptions');
 
 document.addEventListener("DOMContentLoaded", function(){
