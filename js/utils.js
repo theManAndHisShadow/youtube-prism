@@ -41,6 +41,22 @@ function getlastItem(array){
 
 
 /**
+ * Fast way find some value in 2d array;
+ * Return second element of pair key - prop
+ * @param {Array} array 
+ * @param {*} query 
+ * @returns 
+ */
+function searchIn2DArray(array, query){
+    let keys = array.map(pair => {return pair[0]});
+    let index = keys.indexOf(query);
+
+    return index;
+}
+
+
+
+/**
  * Intelegent query function.
  * Use CSS selector, to query some HTMLElement. Based on document.querySelector.
  * Can wark with multiple query, just pass array of query selectors.
