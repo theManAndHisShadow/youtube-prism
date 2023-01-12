@@ -87,24 +87,37 @@ const Prism = {
     /**
      * Searchs in DOM tree target element by querySelector
      * @param {string} selector 
-     * @returns onLoad()
+     * @returns modify() function, that contains referance to target element
      */
     findElement: function(selector){
+        // Trying to find selector in history
         let index = searchIn2DArray(Prism.html.elementSearchHistory, selector);
 
+        // if finded just put in in result var
         if(index > -1){
             result = Prism.html.elementSearchHistory[index][1];
-        } else {
+        } else { // else make async query
             result = asyncQuerySelector(selector);
         }
 
+
+        // chain
         return {
-            onLoad: function(callback){
+            /**
+             * Give access to finded element and invoke callback to make modify changes
+             * @param {Function} callback 
+             */
+            modify: function(callback){
+                // If result is not ready and Primise is pending
                 if(result instanceof Promise) {
+                    // when promise os resolved
                     result = result.then(element => {
+                        // check index again
                         index = searchIn2DArray(Prism.html.elementSearchHistory, selector);
 
+                        // if query dont finded in history - push it to history
                         if(index === -1) Prism.html.elementSearchHistory.push([selector, element]);
+
                         callback(element);
                     });
                 } else {
