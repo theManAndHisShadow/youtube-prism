@@ -4,8 +4,6 @@
 const newHomeLink = "https://www.youtube.com/feed/subscriptions";
 
 
-
-
 /**
  * Main extension object
  */
@@ -26,34 +24,8 @@ const Prism = {
         // state marker that current page targeted by atPage
         isNecessaryPage: false,
 
-
-
-        /**
-         * Execute some code on targeted page. Depends on isNecessaryPage prop
-         * @param {Function} callback 
-         */
-        execute: function(callback){
-            if(this.isNecessaryPage === true) callback();
-
-            this.isNecessaryPage = false;
-        },
-
-
-
-        /**
-         * Redirect to Youtube target page by page name (look Prism.urls)
-         * @param {string} pageName target page name
-         */
-        redirectTo: function(pageName){
-            if(this.isNecessaryPage === true) {
-                let url_redirect = document.createElement("a");
-                url_redirect.href = Prism.urls[pageName];
-        
-                url_redirect.click();
-            }
-
-            this.isNecessaryPage = false;
-        }
+        // list of saved function for special page
+        executionList: {},
     },
 
 
@@ -67,22 +39,82 @@ const Prism = {
         let isAnyPage = pageName === "any";
         let isMainPage = pageName === 'main' && url === Prism.urls[pageName];
 
+        // is url exist on url list
         if(Prism.urls[pageName]){
             if(
                    isAnyPage 
                 || isMainPage 
                 || parseURL(url).pageName === parseURL(Prism.urls[pageName]).pageName
             ) {
-                this.actions.isNecessaryPage = true;  
+                Prism.actions.isNecessaryPage = true;  
             } else {
-                this.actions.isNecessaryPage = false;
+                Prism.actions.isNecessaryPage = false;
             }
         } else {
             throw new Error(pageName + " page does not exist!");
         }
 
-        return this.actions;
+
+        // chain
+        return {
+            /**
+             * Execute some code on targeted page. Depends on isNecessaryPage prop
+             * @param {Function} callback 
+             */
+            execute: function(callback){
+                Prism.actions.executionList[pageName] = callback;
+
+                if(Prism.actions.isNecessaryPage === true) {
+                    callback();
+                }
+    
+                Prism.actions.isNecessaryPage = false;
+
+                console.log(Prism.actions);
+            },
+
+
+
+            /**
+             * Redirect to Youtube target page by page name (look Prism.urls)
+             * @param {string} pageName target page name
+             */
+            redirectTo: function(pageName){
+                if(Prism.actions.isNecessaryPage === true) {
+                    let url_redirect = document.createElement("a");
+                    url_redirect.href = Prism.urls[pageName];
+            
+                    url_redirect.click();
+                }
+
+                Prism.actions.isNecessaryPage = false;
+            }
+        };
     },
+
+
+    /**
+     * Detects if page relaoded or url changed by redirecting to other page
+     */
+    detectURLModify: function(){
+        // Waits one message from extension backend
+        // For more info: https://developer.chrome.com/docs/extensions/mv3/messaging/#native-messaging
+        chrome.runtime.onMessage.addListener(
+            function(message) {
+                let pageName = parseURL(message.url).pageName;
+
+                // if new page name exists in list
+                if(Prism.actions.executionList[pageName]){
+                    // invoke page script, that saves in firest exection to 
+                    // special key
+                    Prism.actions.executionList[pageName]();
+                    console.log("script executions from executionList is done");
+                }
+            }
+          );
+    },
+
+
 
     /**
      * Searchs in DOM tree target element by querySelector
