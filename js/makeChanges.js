@@ -1,5 +1,6 @@
 // Doing some changes here
 
+Prism.detectURLModify();
 Prism.atPage('main').redirectTo('subscriptions');
 
 document.addEventListener("DOMContentLoaded", function(){
