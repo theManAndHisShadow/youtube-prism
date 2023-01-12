@@ -11,11 +11,15 @@ const newHomeLink = "https://www.youtube.com/feed/subscriptions";
  */
 const Prism = {
     // target page URLs
-    pages: {
+    urls: {
         watch: 'https://www.youtube.com/watch',
         subscriptions:  'https://www.youtube.com/feed/subscriptions',
         main:  'https://www.youtube.com/',
         any:   'any',
+    },
+
+    html: {
+        elementSearchHistory: [],
     },
     
     actions: {
@@ -37,13 +41,13 @@ const Prism = {
 
 
         /**
-         * Redirect to Youtube target page by page name (look Prism.pages)
+         * Redirect to Youtube target page by page name (look Prism.urls)
          * @param {string} pageName target page name
          */
         redirectTo: function(pageName){
             if(this.isNecessaryPage === true) {
                 let url_redirect = document.createElement("a");
-                url_redirect.href = Prism.pages[pageName];
+                url_redirect.href = Prism.urls[pageName];
         
                 url_redirect.click();
             }
@@ -61,13 +65,13 @@ const Prism = {
     atPage: function (pageName){
         let url = window.location.href;
         let isAnyPage = pageName === "any";
-        let isMainPage = pageName === 'main' && url === Prism.pages[pageName];
+        let isMainPage = pageName === 'main' && url === Prism.urls[pageName];
 
-        if(Prism.pages[pageName]){
+        if(Prism.urls[pageName]){
             if(
                    isAnyPage 
                 || isMainPage 
-                || parseURL(url).pageName === parseURL(Prism.pages[pageName]).pageName
+                || parseURL(url).pageName === parseURL(Prism.urls[pageName]).pageName
             ) {
                 this.actions.isNecessaryPage = true;  
             } else {
@@ -79,6 +83,36 @@ const Prism = {
 
         return this.actions;
     },
+
+    /**
+     * Searchs in DOM tree target element by querySelector
+     * @param {string} selector 
+     * @returns onLoad()
+     */
+    findElement: function(selector){
+        let index = searchIn2DArray(Prism.html.elementSearchHistory, selector);
+
+        if(index > -1){
+            result = Prism.html.elementSearchHistory[index][1];
+        } else {
+            result = asyncQuerySelector(selector);
+        }
+
+        return {
+            onLoad: function(callback){
+                if(result instanceof Promise) {
+                    result = result.then(element => {
+                        index = searchIn2DArray(Prism.html.elementSearchHistory, selector);
+
+                        if(index === -1) Prism.html.elementSearchHistory.push([selector, element]);
+                        callback(element);
+                    });
+                } else {
+                    callback(result);
+                }
+            }
+        }
+    }
 };
 
 
