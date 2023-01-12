@@ -86,7 +86,7 @@ const Prism = {
 
     /**
      * Searchs in DOM tree target element by querySelector
-     * @param {string} selector 
+     * @param {Array|string} selector May be array of queries or single query
      * @returns modify() function, that contains referance to target element
      */
     findElement: function(selector){

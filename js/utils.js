@@ -97,8 +97,6 @@ function asyncQuerySelector(selectors) {
                 // when local promise finally waited element - push it to array
                 targets.push(resultOfAsyncQuery);
 
-                console.log(targets);
-
                 // if all selectors finded - return using global promise resolve
                 if(targets.length === selectors.length) {
                     // if target length is equals 1, 
