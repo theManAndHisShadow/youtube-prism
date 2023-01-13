@@ -11,14 +11,18 @@ Prism.atPage('main').redirectTo('subscriptions');
 document.addEventListener("DOMContentLoaded", function(){
 
     Prism.atPage('any').execute(() => {
-        Prism.findElement('#start a#logo').modify(logoLink => {
-            remakeLogoButton(logoLink.parentNode);
-        });
-
-        // For cases, where YT logo button also placed in collapsed left menu. F
-        // or example, on watch page
-        Prism.findElement('#contentContainer a#logo').modify(logoLink => {
-            remakeLogoButton(logoLink.parentNode);
+        // Changing YT logo at any YT page
+        Prism.findElement('ytd-topbar-logo-renderer#logo').modify(logo => {
+            Prism.html.logo.modify({
+                logoRef: logo,
+                textMark: 'prism',
+                onclick: function(){
+                    // YT has some own redirect system, just emulates needed click to redirect on subs page
+                    Prism.findElement('#sections #items ytd-guide-entry-renderer').modify(subsButton => {
+                        subsButton.click();
+                    });
+                }
+            });
         });
 
         // Removing first three elements from full size left menu
@@ -38,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function(){
         // removing other features bock
         Prism.findElement('#sections ytd-guide-section-renderer:nth-child(4)').modify(otherFeaturesBlock => {
             otherFeaturesBlock.remove();
+            // console.log(otherFeaturesBlock);
         });
         
         // Removing mini menu
@@ -49,6 +54,20 @@ document.addEventListener("DOMContentLoaded", function(){
     Prism.atPage('subscriptions').execute(() => {});
     
     Prism.atPage('watch').execute(() => {
+        // Extra actions to change YT logo at watch page
+        Prism.findElement('#contentContainer ytd-topbar-logo-renderer').modify(logo => {
+            Prism.html.logo.modify({
+                logoRef: logo,
+                textMark: 'prism',
+                onclick: function(){
+                    // YT has some own redirect system, just emulates needed click to redirect on subs page
+                    Prism.findElement('#sections #items ytd-guide-entry-renderer').modify(subsButton => {
+                        subsButton.click();
+                    });
+                }
+            });
+        });
+
         // Removing the most distractive feature - realted videos >:}
         Prism.findElement('#secondary #related').modify(related => {
             related.remove();
@@ -57,4 +76,5 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
     showOrHideNextVideoButton();
+    console.log(Prism);
 });

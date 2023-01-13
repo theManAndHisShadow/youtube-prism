@@ -12,12 +12,40 @@ const Prism = {
     urls: {
         watch: 'https://www.youtube.com/watch',
         subscriptions:  'https://www.youtube.com/feed/subscriptions',
+        library: 'https://www.youtube.com/feed/library',
         main:  'https://www.youtube.com/',
         any:   'any',
     },
 
+    //HTML based methods
     html: {
+        // for less Primese and Observer calls Prism saves search result here
         elementSearchHistory: [],
+
+        // logo mutations
+        logo: {
+            modify: function({logoRef, textMark = 'custom', onclick = false}){
+                // removing default event listeners
+                let cleaned = removeAllEventListenerOfElement(logoRef);
+                let link = cleaned.children[0];
+                let text = cleaned.children[0].children[0];
+                let mark = cleaned.children[1];
+
+                mark.innerText = textMark; // show extension mark :)
+
+                link.removeAttribute('href');
+                text.removeAttribute('hidden');
+                mark.removeAttribute('hidden');
+
+                // onclick replacer
+                if(onclick instanceof Function){
+                    // changing logo button behavior
+                    cleaned.addEventListener("click", function(event){
+                        onclick();
+                    });
+                }
+            },
+        },
     },
     
     actions: {
@@ -168,33 +196,7 @@ const Prism = {
  * @param {Object} logoButton HTMLElement object reference
  */
 function remakeLogoButton(logoButton){
-    let clonedLogoButton = logoButton.cloneNode(true);
-
-    // Replacing to remove main page redirect on click
-    // IDK how to prevent main page redirect...
-    logoButton.parentNode.replaceChild(clonedLogoButton, logoButton);
-
-    let cloned_logoLink = clonedLogoButton.children[0];
-    let cloned_logoText = clonedLogoButton.children[0].children[0];
-    let cloned_logoCountryMark = clonedLogoButton.children[1];
-
-    cloned_logoLink.href = newHomeLink;
-    cloned_logoText.removeAttribute('hidden');
-    cloned_logoCountryMark.removeAttribute('hidden');
-
-    // changing logo button functional
-    clonedLogoButton.addEventListener("click", function(event){
-        // prevent full page refresh
-        event.preventDefault();
-
-        // query subs page button
-        asyncQuerySelector('#sections #items ytd-guide-entry-renderer').then(element => {
-            element.click(); // emuating subs page nutton clicking
-        });
-    });
-
-    // show extension mark :)
-    cloned_logoCountryMark.innerText = 'prism';
+    
 }
 
 
