@@ -123,7 +123,7 @@ const Prism = {
      */
     findElement: function(selector){
         // Trying to find selector in history
-        let index = searchIn2DArray(Prism.html.elementSearchHistory, selector);
+        let index = searchInKeys2DArray(Prism.html.elementSearchHistory, selector);
 
         // if finded just put in in result var
         if(index > -1){
@@ -145,7 +145,7 @@ const Prism = {
                     // when promise os resolved
                     result = result.then(element => {
                         // check index again
-                        index = searchIn2DArray(Prism.html.elementSearchHistory, selector);
+                        index = searchInKeys2DArray(Prism.html.elementSearchHistory, selector);
 
                         // if query dont finded in history - push it to history
                         if(index === -1) Prism.html.elementSearchHistory.push([selector, element]);
