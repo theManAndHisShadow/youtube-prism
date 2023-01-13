@@ -57,6 +57,22 @@ function searchInKeys2DArray(array, query){
 
 
 /**
+ * Clones element without event listener and replace original element with clone
+ * @param {HTMLElement} elementRef 
+ * @return {HTMLElement} new cloned element
+ */
+function removeAllEventListenerOfElement(elementRef){
+    let cloned = elementRef.cloneNode(true);
+    let parent = elementRef.parentNode;
+
+    parent.replaceChild(cloned, elementRef);
+
+    return cloned;
+}
+
+
+
+/**
  * Intelegent query function.
  * Use CSS selector, to query some HTMLElement. Based on document.querySelector.
  * Can wark with multiple query, just pass array of query selectors.
