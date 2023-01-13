@@ -47,7 +47,7 @@ function getlastItem(array){
  * @param {*} query 
  * @returns 
  */
-function searchIn2DArray(array, query){
+function searchInKeys2DArray(array, query){
     let keys = array.map(pair => {return pair[0]});
     let index = keys.indexOf(query);
 
