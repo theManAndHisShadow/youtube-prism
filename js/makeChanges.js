@@ -76,5 +76,4 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
     showOrHideNextVideoButton();
-    console.log(Prism);
 });

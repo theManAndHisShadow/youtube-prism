@@ -97,8 +97,6 @@ const Prism = {
                 }
     
                 Prism.actions.isNecessaryPage = false;
-
-                console.log(Prism.actions);
             },
 
 
