@@ -68,12 +68,45 @@ document.addEventListener("DOMContentLoaded", function(){
             });
         });
 
+        // Actions with playlist play next video button
+        // It is important beacause default play next video...
+        // ...button on playlist end - play related video
+        Prism.findElement('#items ytd-playlist-panel-video-renderer').modify(playlistVideo => {
+            let playlist = playlistVideo.parentNode.children;
+
+            Prism.findElement('.ytp-left-controls a.ytp-next-button.ytp-button').modify(nextButton => {
+                // when page full reloaded
+                Prism.html.nextVideoButton.toggle(nextButton, playlist);     
+                
+                // if user clicked next video button, check if next video is last video
+                nextButton.addEventListener("click", () => {
+                    Prism.html.nextVideoButton.toggle(nextButton, playlist, nextButton.href);
+                });
+
+                // if user clicked prev video
+                Prism.findElement('.ytp-left-controls a.ytp-prev-button.ytp-button').modify(prevButton => {
+                    prevButton.addEventListener("click", () => {
+                        // check is not replay mode (prev button href must be not empty)
+                        // and if is TRULY not replay mode - unhide next video button*
+                        // *because all prev links not linked with related video...
+                        // ...we can unhide next video button
+                        if(prevButton.href.length > 0) Prism.html.nextVideoButton.toggle(nextButton, playlist, prevButton.href);
+                    });
+                });
+
+                // if user just play other video, get current url from playlist, and toggle button
+                Array.from(playlist).forEach(listItem => {
+                    listItem.addEventListener("click", () => {
+                        let listItemURL = listItem.children[0].href;
+                        Prism.html.nextVideoButton.toggle(nextButton, playlist, listItemURL);
+                    });
+                });
+            });
+        });
+
         // Removing the most distractive feature - realted videos >:}
         Prism.findElement('#secondary #related').modify(related => {
             related.remove();
         });
     });
-
-
-    showOrHideNextVideoButton();
 });
