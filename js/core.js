@@ -46,6 +46,24 @@ const Prism = {
                 }
             },
         },
+
+        nextVideoButton: {
+            toggle: function(nextVideoButton, playlist, videoURL = window.location.href){
+                let currentVideoID = parseURL(videoURL).v;
+                let lastVideo = getlastItem(playlist);
+                let lastVideoID = parseURL(lastVideo.children[0].href).v;
+
+                console.log(nextVideoButton, currentVideoID, lastVideoID);
+        
+                // ...and playlist length greaater than zero and it is not last video* on playlist
+                // *cause i this case play next vide button plays next RELATED video
+                if(playlist.length > 0 && lastVideoID !== currentVideoID) {
+                    nextVideoButton.removeAttribute("hidden"); // unhide next video button
+                } else {
+                    nextVideoButton.setAttribute("hidden", "");
+                }
+            }
+        }
     },
     
     actions: {
@@ -185,84 +203,3 @@ const Prism = {
         }
     }
 };
-
-
-
-
-/**
- * Remaking YT logo button behavior: from redirecting to main page to redirecting to subs page
- * @param {Object} logoButton HTMLElement object reference
- */
-function remakeLogoButton(logoButton){
-    
-}
-
-
-/**
- * Checks if playlist length, current video ID 
- * and playlist videos IDs and show or hide unnecessary 'play next video' button
- */
-function showOrHideNextVideoButton(){
-    function _showOrHide(playlist, currentVideoURL){
-        let currentVideoID = parseURL(currentVideoURL).v;
-        let lastVideo = playlist[playlist.length - 1];
-        let lastVideoID = parseURL(lastVideo.children[0].href).v;
-
-        console.log(currentVideoID, lastVideoID);
-
-        // ...and playlist length greaater than zero and it is not last video* on playlist
-        // *cause i this case play next vide button plays next RELATED video
-        if(playlist.length > 0 && lastVideoID !== currentVideoID) {
-            asyncQuerySelector('.ytp-left-controls a.ytp-next-button.ytp-button').then(nextButton => {
-                nextButton.removeAttribute("hidden"); // unhide next video button
-            });
-        } else {
-            asyncQuerySelector('.ytp-left-controls a.ytp-next-button.ytp-button').then(nextButton => {
-                nextButton.setAttribute("hidden", "");
-            });
-        }
-    }
-
-    // If user don`t create a playlist - hide next video button
-    // cause by default next video button plays next related video
-    asyncQuerySelector('.ytp-left-controls a.ytp-next-button.ytp-button').then(nextButton => {
-        nextButton.setAttribute("hidden", "");
-    });
-
-
-    // but if user playlist is exist
-    asyncQuerySelector('ytd-playlist-panel-video-renderer').then(playlistVideo => {
-        let playlist = playlistVideo.parentNode.children;
-
-        // if page full reloaded
-        _showOrHide(playlist, window.location.href);
-
-        // if user clicked next video button, check is next last video
-        asyncQuerySelector('.ytp-left-controls a.ytp-next-button.ytp-button').then(nextButton => {
-            console.log(nextButton);
-
-            nextButton.addEventListener("click", () => {
-                _showOrHide(playlist, nextButton.href);
-            });
-        });
-
-
-        // if user clicked prev video
-        asyncQuerySelector('.ytp-left-controls a.ytp-prev-button.ytp-button').then(prevButton => {
-            prevButton.addEventListener("click", () => {
-                // check is not replay mode (prev button href must be not empty)
-                // and if is TRULY not replay mode - unhide next video button*
-                // *because all prev links not linked with related video...
-                // ...we can unhide next video button
-                if(prevButton.href.length > 0) _showOrHide(playlist, prevButton.href);
-            });
-        });
-
-        // if user just play other video, get current video url from playlist
-        Array.from(playlist).forEach(listItem => {
-            listItem.addEventListener("click", () => {
-                _showOrHide(playlist, listItem.children[0].href);
-            });
-        })
-    });
-}
