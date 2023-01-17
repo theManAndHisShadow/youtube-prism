@@ -33,7 +33,7 @@ const Prism = {
 
                 mark.innerText = textMark; // show extension mark :)
 
-                link.removeAttribute('href');
+                link.href = Prism.urls.subscriptions;
                 text.removeAttribute('hidden');
                 mark.removeAttribute('hidden');
 
@@ -41,6 +41,7 @@ const Prism = {
                 if(onclick instanceof Function){
                     // changing logo button behavior
                     cleaned.addEventListener("click", function(event){
+                        event.preventDefault();
                         onclick();
                     });
                 }
