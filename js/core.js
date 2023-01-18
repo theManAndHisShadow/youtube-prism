@@ -17,6 +17,26 @@ const Prism = {
         any:   'any',
     },
 
+    playlist: {
+        // video urls from playlist
+        IDs: [],
+        nodes: [],
+        parse: function(playlistParent){
+            let list = Array.from(playlistParent.children);
+
+            list.forEach(item => {
+                // only if it video tag
+                if(item.tagName === 'YTD-PLAYLIST-PANEL-VIDEO-RENDERER') {
+                    // get url
+                    let url = parseURL(item.children[0].href).v;
+                    // push to array
+                    Prism.playlist.IDs.push(url);
+                    Prism.playlist.nodes.push(item);
+                };
+            });
+        },
+    },
+
     //HTML based methods
     html: {
         // for less Primese and Observer calls Prism saves search result here
@@ -48,37 +68,29 @@ const Prism = {
             },
         },
 
-        playlist: {
-            // video urls from playlist
-            urls: [],
-            parse: function(playlistParent){
-                let list = Array.from(playlistParent.children);
-
-                list.forEach(item => {
-                    // only if it video tag
-                    if(item.tagName === 'YTD-PLAYLIST-PANEL-VIDEO-RENDERER') {
-                        // get url
-                        let url = parseURL(item.children[0].href).v;
-                        // push to array
-                        Prism.html.playlist.urls.push(url);
-                    };
-                });
-            },
-        },
-
         nextVideoButton: {
-            toggle: function(nextVideoButton, playlist, videoURL = window.location.href){
-                let currentVideoID = parseURL(videoURL).v;
-                let lastVideo = getlastItem(playlist);
-                let lastVideoID = parseURL(lastVideo.children[0].href).v;
-        
-                // ...and playlist length greaater than zero and it is not last video* on playlist
-                // *cause i this case play next vide button plays next RELATED video
-                if(playlist.length > 0 && lastVideoID !== currentVideoID) {
-                    nextVideoButton.removeAttribute("hidden"); // unhide next video button
-                } else {
-                    nextVideoButton.setAttribute("hidden", "");
-                }
+            /**
+             * Show or hide 'play next video' button
+             * @param {HTMLElement} nextVideoButton reference to HTMLElement of button
+             * @param {string} id (optional) clicked element video ID
+             */
+            toggle: function(nextVideoButton, id){
+                // if id arg empty - use next video button`s video ID
+                id = id || parseURL(nextVideoButton.href).v
+                let lastID = getlastItem(Prism.playlist.IDs);
+
+                    // If next video ID exist in array of current playlist videos
+                    if(Prism.playlist.IDs.indexOf(id) > -1){
+                        // if next video is last element of playlist
+                        if(id === lastID) {
+                            nextVideoButton.setAttribute("hidden", '');
+                        } else {
+                            nextVideoButton.removeAttribute("hidden");
+                        }
+                    } else {
+                        // If next video do not contains in array
+                        nextVideoButton.setAttribute("hidden", '');
+                    }
             }
         }
     },
@@ -185,6 +197,7 @@ const Prism = {
     findElement: function(selector){
         // Trying to find selector in history
         let index = searchInKeys2DArray(Prism.html.elementSearchHistory, selector);
+        let result = null;
 
         // if finded just put in in result var
         if(index > -1){
@@ -193,9 +206,9 @@ const Prism = {
             result = asyncQuerySelector(selector);
         }
 
-
         // chain
         return {
+
             /**
              * Give access to finded element and invoke callback to make modify changes
              * @param {Function} callback 
@@ -218,5 +231,27 @@ const Prism = {
                 }
             }
         }
+    },
+
+
+
+    /**
+     * Helps listen target element and detects attr mutations
+     * @param {HTMLElement} target element listen to
+     * @param {string} attribute target attribue
+     * @param {Function} condition callback-function with condition, that fires resolve
+     * @returns 
+     */
+    detectAttrMutation: function(target, attribute, condition) {
+        return new Promise(resolve => {
+            const observer = new MutationObserver(mutations => {
+                if (condition(target)) {
+                    resolve(target);
+                    observer.disconnect();
+                }
+            });
+
+            observer.observe(target, {attributes: true, attributeFilter: [attribute]});
+        });
     }
 };
