@@ -5,7 +5,8 @@ Prism is a small YouTube browser extension that keeps you focused. No more distr
 * Replacing the main page with a page with subscriptions. 
 * Removed block with recommended videos.
 * Removed fast access to shorts page. 
-* Removed YouTube Navigator links (trands, music, sport and etc. links).
+* Removed YouTube Navigator links (trands, music, sport and etc. links),
+* Changed playlist control behavior: now if playlist ends, 'play next video' button hides.
 
 
 # Installation
