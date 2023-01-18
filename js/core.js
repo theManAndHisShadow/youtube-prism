@@ -48,13 +48,29 @@ const Prism = {
             },
         },
 
+        playlist: {
+            // video urls from playlist
+            urls: [],
+            parse: function(playlistParent){
+                let list = Array.from(playlistParent.children);
+
+                list.forEach(item => {
+                    // only if it video tag
+                    if(item.tagName === 'YTD-PLAYLIST-PANEL-VIDEO-RENDERER') {
+                        // get url
+                        let url = parseURL(item.children[0].href).v;
+                        // push to array
+                        Prism.html.playlist.urls.push(url);
+                    };
+                });
+            },
+        },
+
         nextVideoButton: {
             toggle: function(nextVideoButton, playlist, videoURL = window.location.href){
                 let currentVideoID = parseURL(videoURL).v;
                 let lastVideo = getlastItem(playlist);
                 let lastVideoID = parseURL(lastVideo.children[0].href).v;
-
-                console.log(nextVideoButton, currentVideoID, lastVideoID);
         
                 // ...and playlist length greaater than zero and it is not last video* on playlist
                 // *cause i this case play next vide button plays next RELATED video
@@ -153,7 +169,7 @@ const Prism = {
                     // invoke page script, that saves in firest exection to 
                     // special key
                     Prism.actions.executionList[pageName]();
-                    console.log("script executions from executionList is done");
+                    console.log("script executions from executionList is done, page: ", pageName);
                 }
             }
           );
