@@ -49,11 +49,52 @@ document.addEventListener("DOMContentLoaded", function(){
         Prism.findElement('ytd-mini-guide-renderer[role="navigation"] #items').modify(miniMenu => {
             miniMenu.parentNode.remove();
         });
+
+        console.log('any page')
+
+        // mini playlist modification
+        Prism.findElement('ytd-miniplayer ytd-playlist-panel-video-renderer').modify(element => {
+            let playlist = element.parentNode.children;
+
+            Prism.findElement('.ytp-miniplayer-controls a.ytp-next-button.ytp-button').modify(nextButton => {
+                // when page full reloaded
+                // Detect current video url without loop
+                // Prism.html.nextVideoButton.toggle(nextButton, playlist, );   
+                Prism.findElement('ytd-playlist-panel-video-renderer #index-container').modify(element => {
+                    console.log(element.parentNode);
+                });
+                
+                // if user clicked next video button, check if next video is last video
+                nextButton.addEventListener("click", () => {
+                    Prism.html.nextVideoButton.toggle(nextButton, playlist, nextButton.href);
+                });
+
+                // if user clicked prev video
+                Prism.findElement('.ytp-miniplayer-controls a.ytp-prev-button.ytp-button').modify(prevButton => {
+                    prevButton.addEventListener("click", () => {
+                        // check is not replay mode (prev button href must be not empty)
+                        // and if is TRULY not replay mode - unhide next video button*
+                        // *because all prev links not linked with related video...
+                        // ...we can unhide next video button
+                        if(prevButton.href.length > 0) Prism.html.nextVideoButton.toggle(nextButton, playlist, prevButton.href);
+                    });
+                });
+
+                // if user just play other video, get current url from playlist, and toggle button
+                Array.from(playlist).forEach(listItem => {
+                    listItem.addEventListener("click", () => {
+                        let listItemURL = listItem.children[0].href;
+                        Prism.html.nextVideoButton.toggle(nextButton, playlist, listItemURL);
+                    });
+                });
+            });
+        });
     });
     
     Prism.atPage('subscriptions').execute(() => {});
     
     Prism.atPage('watch').execute(() => {
+
         // Extra actions to change YT logo at watch page
         Prism.findElement('#contentContainer ytd-topbar-logo-renderer').modify(logo => {
             Prism.html.logo.modify({
@@ -72,35 +113,41 @@ document.addEventListener("DOMContentLoaded", function(){
         // It is important beacause default play next video...
         // ...button on playlist end - play related video
         Prism.findElement('#items ytd-playlist-panel-video-renderer').modify(playlistVideo => {
-            let playlist = playlistVideo.parentNode.children;
+            // If playist exist, parse all videos from it
+            Prism.playlist.parse(playlistVideo.parentNode);
+
 
             Prism.findElement('.ytp-left-controls a.ytp-next-button.ytp-button').modify(nextButton => {
-                // when page full reloaded
-                Prism.html.nextVideoButton.toggle(nextButton, playlist);     
-                
-                // if user clicked next video button, check if next video is last video
-                nextButton.addEventListener("click", () => {
-                    Prism.html.nextVideoButton.toggle(nextButton, playlist, nextButton.href);
-                });
+                Prism.detectAttrMutation(nextButton, 'href', element => {return element.href.length > 0})
+                     .then(nextButton => {
+                        console.log(nextButton);
+                        Prism.html.nextVideoButton.toggle(nextButton);     
+                        
+                        // if user clicked next video button, check if next video is last video
+                        nextButton.addEventListener("click", () => {
+                            Prism.html.nextVideoButton.toggle(nextButton)
+                        });
 
-                // if user clicked prev video
-                Prism.findElement('.ytp-left-controls a.ytp-prev-button.ytp-button').modify(prevButton => {
-                    prevButton.addEventListener("click", () => {
-                        // check is not replay mode (prev button href must be not empty)
-                        // and if is TRULY not replay mode - unhide next video button*
-                        // *because all prev links not linked with related video...
-                        // ...we can unhide next video button
-                        if(prevButton.href.length > 0) Prism.html.nextVideoButton.toggle(nextButton, playlist, prevButton.href);
-                    });
-                });
+                        // if user clicked prev video
+                        Prism.findElement('.ytp-left-controls a.ytp-prev-button.ytp-button').modify(prevButton => {
+                            prevButton.addEventListener("click", () => {
+                                // check is not replay mode (prev button href must be not empty)
+                                // and if is TRULY not replay mode - unhide next video button*
+                                // *because all prev links not linked with related video...
+                                // ...we can unhide next video button
+                                if(prevButton.href.length > 0) {
+                                    nextButton.removeAttribute("hidden");
+                                }
+                            });
+                        });
 
-                // if user just play other video, get current url from playlist, and toggle button
-                Array.from(playlist).forEach(listItem => {
-                    listItem.addEventListener("click", () => {
-                        let listItemURL = listItem.children[0].href;
-                        Prism.html.nextVideoButton.toggle(nextButton, playlist, listItemURL);
-                    });
-                });
+                        // if user just play other video, get current url from playlist, and toggle button
+                        Prism.playlist.nodes.forEach(node => {
+                            node.addEventListener("click", () => {
+                                Prism.html.nextVideoButton.toggle(nextButton, parseURL(node.children[0].href).v);
+                            });
+                        });
+                     });
             });
         });
 
