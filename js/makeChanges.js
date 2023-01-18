@@ -53,40 +53,42 @@ document.addEventListener("DOMContentLoaded", function(){
         console.log('any page')
 
         // mini playlist modification
-        Prism.findElement('ytd-miniplayer ytd-playlist-panel-video-renderer').modify(element => {
-            let playlist = element.parentNode.children;
+        Prism.findElement('ytd-miniplayer ytd-playlist-panel-video-renderer').modify(playlistVideo => {
+            // If playist exist, parse all videos from it
+            Prism.playlist.parse(playlistVideo.parentNode);
+
 
             Prism.findElement('.ytp-miniplayer-controls a.ytp-next-button.ytp-button').modify(nextButton => {
-                // when page full reloaded
-                // Detect current video url without loop
-                // Prism.html.nextVideoButton.toggle(nextButton, playlist, );   
-                Prism.findElement('ytd-playlist-panel-video-renderer #index-container').modify(element => {
-                    console.log(element.parentNode);
-                });
-                
-                // if user clicked next video button, check if next video is last video
-                nextButton.addEventListener("click", () => {
-                    Prism.html.nextVideoButton.toggle(nextButton, playlist, nextButton.href);
-                });
+                Prism.detectAttrMutation(nextButton, 'href', element => {return element.href.length > 0})
+                     .then(nextButton => {
+                        console.log(nextButton);
+                        Prism.html.nextVideoButton.toggle(nextButton);     
+                        
+                        // if user clicked next video button, check if next video is last video
+                        nextButton.addEventListener("click", () => {
+                            Prism.html.nextVideoButton.toggle(nextButton)
+                        });
 
-                // if user clicked prev video
-                Prism.findElement('.ytp-miniplayer-controls a.ytp-prev-button.ytp-button').modify(prevButton => {
-                    prevButton.addEventListener("click", () => {
-                        // check is not replay mode (prev button href must be not empty)
-                        // and if is TRULY not replay mode - unhide next video button*
-                        // *because all prev links not linked with related video...
-                        // ...we can unhide next video button
-                        if(prevButton.href.length > 0) Prism.html.nextVideoButton.toggle(nextButton, playlist, prevButton.href);
-                    });
-                });
+                        // if user clicked prev video
+                        Prism.findElement('.ytp-miniplayer-controls a.ytp-prev-button.ytp-button').modify(prevButton => {
+                            prevButton.addEventListener("click", () => {
+                                // check is not replay mode (prev button href must be not empty)
+                                // and if is TRULY not replay mode - unhide next video button*
+                                // *because all prev links not linked with related video...
+                                // ...we can unhide next video button
+                                if(prevButton.href.length > 0) {
+                                    nextButton.removeAttribute("hidden");
+                                }
+                            });
+                        });
 
-                // if user just play other video, get current url from playlist, and toggle button
-                Array.from(playlist).forEach(listItem => {
-                    listItem.addEventListener("click", () => {
-                        let listItemURL = listItem.children[0].href;
-                        Prism.html.nextVideoButton.toggle(nextButton, playlist, listItemURL);
-                    });
-                });
+                        // if user just play other video, get current url from playlist, and toggle button
+                        Prism.playlist.nodes.forEach(node => {
+                            node.addEventListener("click", () => {
+                                Prism.html.nextVideoButton.toggle(nextButton, parseURL(node.children[0].href).v);
+                            });
+                        });
+                     });
             });
         });
     });
