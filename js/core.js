@@ -40,8 +40,9 @@ const Prism = {
          * 
          * @param {string} id 
          */
-        add: function(id){
+        add: function(id, node){
             Prism.playlist.IDs.push(id);
+            Prism.playlist.nodes.push(node);
         }
     },
 
@@ -99,6 +100,7 @@ const Prism = {
                         // If next video do not contains in array
                         nextVideoButton.setAttribute("hidden", '');
                     }
+
             },
 
             hide: function(HTMLElement){
@@ -268,6 +270,26 @@ const Prism = {
             });
 
             observer.observe(target, {attributes: true, attributeFilter: [attribute]});
+        });
+    }, 
+
+    detectDOMMutation: function(target, newElementTag){
+        return new Promise(resolve => {
+            const observer = new MutationObserver(mutations => {
+                let result = mutations.find(mutation => {
+                    return mutation.target.tagName.toLowerCase() == newElementTag;
+                });
+
+                if (result) {
+                    resolve(result.target);
+                    observer.disconnect();
+                }
+            });
+
+            observer.observe(target, {
+                childList: true,
+                subtree: true
+            });
         });
     }
 };
