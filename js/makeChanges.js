@@ -50,7 +50,52 @@ document.addEventListener("DOMContentLoaded", function(){
             miniMenu.parentNode.remove();
         });
 
-        console.log('any page')
+        // 'add to queue' button must impact at 'play next video' button behavior
+        // On page that has #contents block (subs, library...)
+        Prism.findElement('#contents').modify(element => {
+            // check if user click on some #contents child element
+            element.addEventListener('mousedown', event => {
+                // target element - 'add to queue' button
+                let addToQueueButtonNode = event.target.parentNode;
+                let addToQueueButtonTagName = 'ytd-thumbnail-overlay-toggle-button-renderer';
+
+                // if child element has needed tag and it is target button
+                let isNodeTagCorrect = addToQueueButtonNode.tagName.toLowerCase() === addToQueueButtonTagName;
+                let isNodeSecondChild = addToQueueButtonNode === event.target.parentNode.parentNode.children[1];
+
+                // check condition above
+                if(isNodeTagCorrect && isNodeSecondChild){
+                    let linkToVideo = event.target.parentNode.parentNode.parentNode;
+                    let url = linkToVideo.href;
+                    let videoID = /\/shorts\//.test(url) ? // NB: short videos has different url
+                        url.replace('https://www.youtube.com/shorts/', '') : parseURL(url).v;
+
+                    
+                    // find next button element
+                    Prism.findElement('.ytp-miniplayer-controls a.ytp-next-button.ytp-button').modify(nextButton => {
+                        // when we add new video to playlist
+                        // it means that we can unhide button
+                        Prism.html.nextVideoButton.show(nextButton);
+
+                        // add new video to Prism.playlist
+                        // and add event handler to new element in list NODE
+                        Prism.findElement('ytd-playlist-panel-renderer#playlist #items').modify(playlist => {
+                            // NB!: The button does not appear instantly in the DOM tree, 
+                            // a mutation based method to determine when this node appeared in the tree 
+                            Prism.detectDOMMutation(playlist, 'ytd-playlist-panel-video-renderer')
+                                 .then(newElement => {
+                                    Prism.playlist.add(videoID, newElement);
+
+                                    // add event listener and handler to new element
+                                    newElement.addEventListener('click', function(){
+                                        Prism.html.nextVideoButton.toggle(nextButton, parseURL(newElement.children[0].href).v);
+                                    });
+                                 });                            
+                        });
+                    });
+                }
+            });
+        });
 
         // mini playlist modification
         Prism.findElement('ytd-miniplayer ytd-playlist-panel-video-renderer').modify(playlistVideo => {
@@ -76,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function(){
                                 // *because all prev links not linked with related video...
                                 // ...we can unhide next video button
                                 if(prevButton.href.length > 0) {
-                                    nextButton.removeAttribute("hidden");
+                                    Prism.html.nextVideoButton.show(nextButton);
                                 }
                             });
                         });
@@ -136,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function(){
                                 // *because all prev links not linked with related video...
                                 // ...we can unhide next video button
                                 if(prevButton.href.length > 0) {
-                                    nextButton.removeAttribute("hidden");
+                                    Prism.html.nextVideoButton.show(nextButton);
                                 }
                             });
                         });
