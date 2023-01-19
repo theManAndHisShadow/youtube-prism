@@ -61,7 +61,6 @@ document.addEventListener("DOMContentLoaded", function(){
             Prism.findElement('.ytp-miniplayer-controls a.ytp-next-button.ytp-button').modify(nextButton => {
                 Prism.detectAttrMutation(nextButton, 'href', element => {return element.href.length > 0})
                      .then(nextButton => {
-                        console.log(nextButton);
                         Prism.html.nextVideoButton.toggle(nextButton);     
                         
                         // if user clicked next video button, check if next video is last video
@@ -122,7 +121,6 @@ document.addEventListener("DOMContentLoaded", function(){
             Prism.findElement('.ytp-left-controls a.ytp-next-button.ytp-button').modify(nextButton => {
                 Prism.detectAttrMutation(nextButton, 'href', element => {return element.href.length > 0})
                      .then(nextButton => {
-                        console.log(nextButton);
                         Prism.html.nextVideoButton.toggle(nextButton);     
                         
                         // if user clicked next video button, check if next video is last video
