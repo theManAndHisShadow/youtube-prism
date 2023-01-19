@@ -35,6 +35,14 @@ const Prism = {
                 };
             });
         },
+
+        /**
+         * 
+         * @param {string} id 
+         */
+        add: function(id){
+            Prism.playlist.IDs.push(id);
+        }
     },
 
     //HTML based methods
@@ -91,7 +99,15 @@ const Prism = {
                         // If next video do not contains in array
                         nextVideoButton.setAttribute("hidden", '');
                     }
-            }
+            },
+
+            hide: function(HTMLElement){
+                HTMLElement.setAttribute("hidden", '');
+            },
+
+            show: function(HTMLElement){
+                HTMLElement.removeAttribute("hidden");
+            },
         }
     },
     
