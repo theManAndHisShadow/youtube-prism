@@ -41,22 +41,6 @@ function getlastItem(array){
 
 
 /**
- * Fast way find some value in 2d array;
- * Return second element of pair key - prop
- * @param {Array} array 
- * @param {*} query 
- * @returns 
- */
-function searchInKeys2DArray(array, query){
-    let keys = array.map(pair => {return pair[0]});
-    let index = keys.indexOf(query);
-
-    return index;
-}
-
-
-
-/**
  * Clones element without event listener and replace original element with clone
  * @param {HTMLElement} elementRef 
  * @return {HTMLElement} new cloned element
