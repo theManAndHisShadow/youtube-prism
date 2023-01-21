@@ -42,7 +42,6 @@ document.addEventListener("DOMContentLoaded", function(){
         // removing other features bock
         Prism.findElement('#sections ytd-guide-section-renderer:nth-child(4)').modify(otherFeaturesBlock => {
             otherFeaturesBlock.remove();
-            // console.log(otherFeaturesBlock);
         });
         
         // Removing mini menu
@@ -199,6 +198,24 @@ document.addEventListener("DOMContentLoaded", function(){
                         });
                      });
             });
+        });
+
+
+        Prism.findElement('#primary #player-container .html5-endscreen.ytp-player-content.videowall-endscreen').modify(endScreen => {
+            let previous = endScreen.children[0];
+            let content = endScreen.children[1];
+            let next = endScreen.children[2];
+
+            if(content){
+                Prism.detectDOMMutation(content, 'a').then(mutationResult => {
+                    content.remove();
+                });
+            }
+
+            if(previous && next){
+                previous.remove();
+                next.remove();
+            }
         });
 
         // Removing the most distractive feature - realted videos >:}
