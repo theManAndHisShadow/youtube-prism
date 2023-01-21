@@ -73,24 +73,23 @@ document.addEventListener("DOMContentLoaded", function(){
                     
                     // find next button element
                     Prism.findElement('.ytp-miniplayer-controls a.ytp-next-button.ytp-button').modify(nextButton => {
-                        // when we add new video to playlist
-                        // it means that we can unhide button
-                        Prism.html.nextVideoButton.show(nextButton);
-
-                        // add new video to Prism.playlist
-                        // and add event handler to new element in list NODE
                         Prism.findElement('ytd-playlist-panel-renderer#playlist #items').modify(playlist => {
                             // NB!: The button does not appear instantly in the DOM tree, 
                             // a mutation based method to determine when this node appeared in the tree 
-                            Prism.detectDOMMutation(playlist, 'ytd-playlist-panel-video-renderer')
-                                 .then(newElement => {
-                                    Prism.playlist.add(videoID, newElement);
+                            Prism.detectDOMMutation(playlist, 'ytd-playlist-panel-video-renderer').then(mutationResult => {
+                                    // add new video to Prism.playlist
+                                    Prism.playlist.add(videoID, mutationResult);
+
+                                    // when we add new video to playlist
+                                    // it means that we can unhide button
+                                    // but only if is not first video
+                                    if(Prism.playlist.IDs.length > 1) Prism.html.nextVideoButton.show(nextButton);
 
                                     // add event listener and handler to new element
-                                    newElement.addEventListener('click', function(){
-                                        Prism.html.nextVideoButton.toggle(nextButton, parseURL(newElement.children[0].href).v);
+                                    mutationResult.addEventListener('click', function(){
+                                        Prism.html.nextVideoButton.toggle(nextButton, parseURL(mutationResult.children[0].href).v);
                                     });
-                                 });                            
+                            });                   
                         });
                     });
                 }
@@ -133,6 +132,12 @@ document.addEventListener("DOMContentLoaded", function(){
                             });
                         });
                      });
+            });
+        });
+
+        Prism.findElement('yt-confirm-dialog-renderer yt-button-renderer:last-child').modify(closeButton => {
+            closeButton.addEventListener('click', function(){
+                Prism.playlist.toClear();
             });
         });
     });
