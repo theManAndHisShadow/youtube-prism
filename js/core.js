@@ -204,7 +204,7 @@ const Prism = {
                     // invoke page script, that saves in firest exection to 
                     // special key
                     Prism.actions.executionList[pageName]();
-                    console.log("Detected url chane, current page: ", pageName);
+                    console.log("Detected url change, current page: ", pageName);
                 }
             }
           );
