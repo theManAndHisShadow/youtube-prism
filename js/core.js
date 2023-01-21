@@ -53,9 +53,6 @@ const Prism = {
 
     //HTML based methods
     html: {
-        // for less Primese and Observer calls Prism saves search result here
-        elementSearchHistory: [],
-
         // logo mutations
         logo: {
             modify: function({logoRef, textMark = 'custom', onclick = false}){
@@ -199,6 +196,8 @@ const Prism = {
             function(message) {
                 let pageName = parseURL(message.url).pageName;
 
+                console.log(pageName);
+
                 // if new page name exists in list
                 if(Prism.actions.executionList[pageName]){
                     // invoke page script, that saves in firest exection to 
@@ -218,16 +217,7 @@ const Prism = {
      * @returns modify() function, that contains referance to target element
      */
     findElement: function(selector){
-        // Trying to find selector in history
-        let index = searchInKeys2DArray(Prism.html.elementSearchHistory, selector);
-        let result = null;
-
-        // if finded just put in in result var
-        if(index > -1){
-            result = Prism.html.elementSearchHistory[index][1];
-        } else { // else make async query
-            result = asyncQuerySelector(selector);
-        }
+        let result = asyncQuerySelector(selector);
 
         // chain
         return {
@@ -241,12 +231,6 @@ const Prism = {
                 if(result instanceof Promise) {
                     // when promise os resolved
                     result = result.then(element => {
-                        // check index again
-                        index = searchInKeys2DArray(Prism.html.elementSearchHistory, selector);
-
-                        // if query dont finded in history - push it to history
-                        if(index === -1) Prism.html.elementSearchHistory.push([selector, element]);
-
                         callback(element);
                     });
                 } else {
