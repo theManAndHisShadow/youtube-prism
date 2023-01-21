@@ -43,7 +43,14 @@ const Prism = {
         add: function(id, node){
             Prism.playlist.IDs.push(id);
             Prism.playlist.nodes.push(node);
-        }
+
+            console.log(Prism.playlist.IDs);
+        },
+
+        toClear: function(){
+            Prism.playlist.IDs = [];
+            Prism.playlist.nodes = [];
+        },
     },
 
     //HTML based methods
@@ -273,15 +280,36 @@ const Prism = {
         });
     }, 
 
-    detectDOMMutation: function(target, newElementTag){
+
+
+    /**
+     * Helps listen target element and detects node tree mutations
+     * @param {HTMLElement} target element listen to
+     * @param {string} nodeTag target node tag name
+     * @returns 
+     */
+    detectDOMMutation: function(target, nodeTag){
         return new Promise(resolve => {
             const observer = new MutationObserver(mutations => {
-                let result = mutations.find(mutation => {
-                    return mutation.target.tagName.toLowerCase() == newElementTag;
+                let changes = [];
+                let result;
+
+                mutations.forEach(mutation => {
+                    let added = Array.from(mutation.addedNodes);
+                    let removed = Array.from(mutation.removedNodes);
+
+                    changes = changes.concat(added, removed);
                 });
 
+                result = changes.find(change => {
+                    if(change.tagName){
+                        return  change.tagName.toLowerCase() == nodeTag
+                    }
+                });
+
+
                 if (result) {
-                    resolve(result.target);
+                    resolve(result);
                     observer.disconnect();
                 }
             });
