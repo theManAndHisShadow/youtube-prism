@@ -75,56 +75,28 @@ function removeAllEventListenerOfElement(elementRef){
 /**
  * Intelegent query function.
  * Use CSS selector, to query some HTMLElement. Based on document.querySelector.
- * Can wark with multiple query, just pass array of query selectors.
  * Observer idea from this solution: https://stackoverflow.com/questions/5525071/how-to-wait-until-an-element-exists
  * @param {(string|Array)} selector CSS Selector
  * @returns 
  */
-function asyncQuerySelector(selectors) {
-    // If is single query, make array
-    if(!Array.isArray(selectors)) selectors = [selectors];
-
-    let targets = [];
-
-    // Some soup of Promises, lol
-    // Global promise control that all queries from array are satisfied
-    return new Promise(fullResolve => {
-        selectors.forEach(selector => {
-            // Local promise wait when HTMLElement is visible and exist
-            return new Promise(arrayResolve => {
-                // if exit return it using resolve
-                if (document.querySelector(selector)) {
-                    return arrayResolve(document.querySelector(selector));
-                }
-                
-                // or use MutationObserver monster
-                const observer = new MutationObserver(mutations => {
-                    if (document.querySelector(selector)) {
-                        arrayResolve(document.querySelector(selector));
-                        observer.disconnect();
-                    }
-                });
+function asyncQuerySelector(selector) {
+    return new Promise(arrayResolve => {
+        // if exit return it using resolve
+        if (document.querySelector(selector)) {
+            return arrayResolve(document.querySelector(selector));
+        }
         
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
-            }).then(resultOfAsyncQuery => {
-                // when local promise finally waited element - push it to array
-                targets.push(resultOfAsyncQuery);
+        // or use MutationObserver monster
+        const observer = new MutationObserver(mutations => {
+            if (document.querySelector(selector)) {
+                arrayResolve(document.querySelector(selector));
+                observer.disconnect();
+            }
+        });
 
-                // if all selectors finded - return using global promise resolve
-                if(targets.length === selectors.length) {
-                    // if target length is equals 1, 
-                    // that means function works in single mode
-                    if(targets.length === 1) {
-                        fullResolve(targets[0]);
-                    } else {
-                    // else return entire array, and function works in multi mode
-                        fullResolve(targets);
-                    }
-                }
-            });
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
         });
     });
 }
