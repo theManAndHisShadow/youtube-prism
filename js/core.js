@@ -43,8 +43,6 @@ const Prism = {
         add: function(id, node){
             Prism.playlist.IDs.push(id);
             Prism.playlist.nodes.push(node);
-
-            console.log(Prism.playlist.IDs);
         },
 
         toClear: function(){
