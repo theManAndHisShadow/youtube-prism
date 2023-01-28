@@ -17,6 +17,8 @@ const Prism = {
         any:   'any',
     },
 
+    settings: null,
+
     playlist: {
         // video urls from playlist
         IDs: [],
@@ -194,16 +196,18 @@ const Prism = {
         // For more info: https://developer.chrome.com/docs/extensions/mv3/messaging/#native-messaging
         chrome.runtime.onMessage.addListener(
             function(message) {
-                let pageName = parseURL(message.url).pageName;
+                if(message.url) {
+                    let pageName = parseURL(message.url).pageName;
 
-                console.log(pageName);
-
-                // if new page name exists in list
-                if(Prism.actions.executionList[pageName]){
-                    // invoke page script, that saves in firest exection to 
-                    // special key
-                    Prism.actions.executionList[pageName]();
-                    console.log("Detected url change, current page: ", pageName);
+                    console.log(pageName);
+    
+                    // if new page name exists in list
+                    if(Prism.actions.executionList[pageName]){
+                        // invoke page script, that saves in firest exection to 
+                        // special key
+                        Prism.actions.executionList[pageName]();
+                        console.log("Detected url change, current page: ", pageName);
+                    }
                 }
             }
           );
@@ -301,5 +305,18 @@ const Prism = {
                 subtree: true
             });
         });
-    }
+    },
+
+    /**
+     * Loads extension settings from backend;
+     */
+    loadSettings: function(){
+        chrome.runtime.sendMessage({loadSettings: true, from: "core"});
+
+        chrome.runtime.onMessage.addListener(function(message) {
+            if(message.settings) {
+                Prism.settings = message.settings;
+            }
+        });
+    },
 };
