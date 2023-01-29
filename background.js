@@ -1,9 +1,9 @@
 // Default extension settings stores here
 const EXTENSION_DEFAULT_SETTINGS = {
     targetSite: 'www.youtube.com',
-    shorts: {
-        use_classic_player: true,
-    },
+
+    //Settings key format is now used in data- attributes at popup
+    "shorts-classic-player": true,
 };
 
 
@@ -25,6 +25,7 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(async () => {
         }
     }
 });
+
 
 // waits message from other pages
 chrome.runtime.onMessage.addListener(async (request) => {
