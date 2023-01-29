@@ -175,10 +175,7 @@ const Prism = {
              */
             redirectTo: function(pageName){
                 if(Prism.actions.isNecessaryPage === true) {
-                    let url_redirect = document.createElement("a");
-                    url_redirect.href = Prism.urls[pageName];
-            
-                    url_redirect.click();
+                    redirectTo(Prism.urls[pageName]);
                 }
 
                 Prism.actions.isNecessaryPage = false;
@@ -211,6 +208,16 @@ const Prism = {
                 }
             }
           );
+    },
+
+
+
+    /**
+     * Redirects user to some (target) page. 
+     * @param {string} url target page url
+     */
+    redirectTo: function(url){
+        redirectTo(url);
     },
 
 
