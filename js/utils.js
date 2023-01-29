@@ -30,6 +30,19 @@ function parseURL(url){
 
 
 /**
+ * Redirects user to some (target) page. 
+ * @param {string} url target page url
+ */
+function redirectTo(url){
+    let url_redirect = document.createElement("a");
+        url_redirect.href = url;
+
+        url_redirect.click();
+}
+
+
+
+/**
  * Returns last item of array
  * @param {Array} array 
  * @returns
