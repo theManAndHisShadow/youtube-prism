@@ -1,4 +1,5 @@
-const EXTENSION_SETTINGS = {
+// Default extension settings stores here
+const EXTENSION_DEFAULT_SETTINGS = {
     targetSite: 'www.youtube.com',
     shorts: {
         use_classic_player: true,
@@ -11,14 +12,17 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(async () => {
     // get all active tabs
     const [tab] = await chrome.tabs.query({active: true, lastFocusedWindow: true}); 
 
-    // prepare url
-    let url = tab.url.split('//')[1].split('/')[0]; // https://www.youtube.com/feed/subscriptions
+    // sometimes url is undefined (on browser setting pages)
+    if(tab.url) {
+        // prepare url
+        let url = tab.url.split('//')[1].split('/')[0]; // https://www.youtube.com/feed/subscriptions
 
-    // if history changes from YT tabs
-    if(url === EXTENSION_SETTINGS.targetSite){
-        // send message
-        const response = await chrome.tabs.sendMessage(tab.id, {url: tab.url});
-        // do something with response here, not outside the function
+        // if history changes from YT tabs
+        if(url === EXTENSION_DEFAULT_SETTINGS.targetSite){
+            // send message
+            const response = await chrome.tabs.sendMessage(tab.id, {url: tab.url});
+            // do something with response here, not outside the function
+        }
     }
 });
 
@@ -26,7 +30,17 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(async () => {
 chrome.runtime.onMessage.addListener(async (request) => {
     // on setting load request
     if(request.loadSettings === true) {
-        const settings = await chrome.storage.sync.get('settings');
+        let settings = await chrome.storage.sync.get('settings');
+
+        // if user turn on extension for first time
+        if(!settings || (typeof settings === 'object' && Object.keys(settings).length === 0)) {
+            chrome.storage.sync.set({
+                settings: EXTENSION_DEFAULT_SETTINGS
+            });
+
+            // save default
+            settings = await chrome.storage.sync.get('settings');
+        }
 
         if(request.from === "core"){
             const [tab] = await chrome.tabs.query({active: true, lastFocusedWindow: true}); 
