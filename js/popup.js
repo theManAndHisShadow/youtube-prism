@@ -1,4 +1,5 @@
 const PrismPopup = {
+    //data attribute prefixes of target elements
     settingsPrefix: "data-settings__",
 
     html: {
@@ -13,6 +14,10 @@ const PrismPopup = {
     },
 
 
+    /**
+     * Requests extension settings from backend (ackground).
+     * @returns Promise
+     */
     requestCurrentSettings: async function(){
         chrome.runtime.sendMessage({loadSettings: true, from: "popup"});
 
@@ -28,6 +33,9 @@ const PrismPopup = {
     },
 
 
+    /**
+     * Load and shows settings to popup page.
+     */
     loadSettings: async function(){
         let settings = await PrismPopup.requestCurrentSettings();
         let keys = Object.keys(settings);
@@ -41,6 +49,7 @@ const PrismPopup = {
         })
     },
 };
+
 
 document.addEventListener("DOMContentLoaded", function(){
     PrismPopup.init();
