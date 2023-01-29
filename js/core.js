@@ -17,8 +17,6 @@ const Prism = {
         any:   'any',
     },
 
-    settings: null,
-
     playlist: {
         // video urls from playlist
         IDs: [],
@@ -126,6 +124,7 @@ const Prism = {
     },
 
 
+
     /**
      * Controls that current page is targeted. Impacts to isNecessaryPage prop
      * @param {string} pageName 
@@ -186,6 +185,7 @@ const Prism = {
             }
         };
     },
+
 
 
     /**
@@ -307,16 +307,22 @@ const Prism = {
         });
     },
 
+
     /**
-     * Loads extension settings from backend;
+     * Requests extension settings from backend (ackground).
+     * @returns Promise
      */
-    loadSettings: function(){
+    requestCurrentSettings: async function(){
         chrome.runtime.sendMessage({loadSettings: true, from: "core"});
 
-        chrome.runtime.onMessage.addListener(function(message) {
-            if(message.settings) {
-                Prism.settings = message.settings;
-            }
+        return new Promise((resolve, reject) => {
+            chrome.runtime.onMessage.addListener(function(message) {
+                if(message.settings) {
+                    resolve(message.settings);
+                } else {
+                    reject();
+                }
+            });
         });
     },
 };

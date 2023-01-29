@@ -1,8 +1,5 @@
 // Doing some changes here
 
-// Load extensions settings from backends
-Prism.loadSettings();
-
 // If user change page, we can reuse some parts of code below at this script
 // Cause  Prism.atPage('any').execute() save .execute() inner function to page name prop...
 /// ...at executionList
@@ -10,10 +7,10 @@ Prism.detectURLModify();
 // Preventing default YouTube main page loading
 Prism.atPage('main').redirectTo('subscriptions');
 
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", async () => {
+    const SETTINGS = await Prism.requestCurrentSettings();
 
-    Prism.atPage('any').execute(() => {
-        console.log(Prism.settings);
+    Prism.atPage('any').execute(async () => {
 
         // Changing YT logo at any YT page
         Prism.findElement('ytd-topbar-logo-renderer#logo').modify(logo => {
