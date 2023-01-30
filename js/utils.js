@@ -97,3 +97,26 @@ function asyncQuerySelector(selector) {
         });
     });
 }
+
+
+
+/**
+ * Gives full access to non-extension window global variables.
+ * [DISCLAIMER]: This helper uses BAD methods, can create new VULNERABILITES!
+ * Source: https://stackoverflow.com/a/9517879
+ * @param {string} variable variable name
+ */
+function grabWndowVariable(variable, callback){
+
+    injectCode = 
+    `
+        if (typeof ${variable} !== 'undefined'){
+            (f_${callback})(${variable})
+        }
+    `;
+
+
+    document.documentElement.setAttribute('onreset', injectCode);
+    document.documentElement.dispatchEvent(new CustomEvent('reset'));
+    document.documentElement.removeAttribute('onreset');
+}
