@@ -119,9 +119,16 @@ input:checked + .slider:before {
 }
 
 #info a {
-    background: #dedede;
+    background: #313131;
     padding: 3px 6px;
     border-radius: 5px;
     top: 6px;
+    left: 25px;
     position: relative;
+    color: #787878;
+    transition: 0.3s ease;
+}
+
+#info a:hover {
+    color: white;
 }
